@@ -4,6 +4,7 @@ import createGroup from '@functions/createGroup';
 import getGroups from '@functions/getGroups';
 import getImage from '@functions/getImage';
 import getImages from '@functions/getImages';
+import createImage from '@functions/createImage';
 import hello from '@functions/hello';
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
@@ -40,7 +41,7 @@ const serverlessConfiguration: AWS = {
       },
       {
         Effect: 'Allow',
-        Action: ['dynamodb:Query'],
+        Action: ['dynamodb:Query', 'dynamodb:PutItem'],
         Resource: `arn:aws:dynamodb:${region}:*:table/${imagesTable}`,
       },
       {
@@ -119,7 +120,14 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { hello, getGroups, createGroup, getImages, getImage },
+  functions: {
+    hello,
+    getGroups,
+    createGroup,
+    getImages,
+    getImage,
+    createImage,
+  },
   package: { individually: true },
   custom: {
     esbuild: {
