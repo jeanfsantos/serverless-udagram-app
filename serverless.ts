@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 
 import createGroup from '@functions/createGroup';
 import getGroups from '@functions/getGroups';
+import getImage from '@functions/getImage';
 import getImages from '@functions/getImages';
 import hello from '@functions/hello';
 import { region } from '@libs/check-region';
@@ -9,6 +10,7 @@ import { stage } from '@libs/check-stage';
 
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;
+const imageIdIndex = 'imageIdIndex';
 
 const serverlessConfiguration: AWS = {
   service: 'serverless-udagram-app',
@@ -26,6 +28,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       GROUPS_TABLE: groupsTable,
       IMAGES_TABLE: imagesTable,
+      IMAGE_ID_INDEX: imageIdIndex,
     },
     region,
     stage,
@@ -39,6 +42,11 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: ['dynamodb:Query'],
         Resource: `arn:aws:dynamodb:${region}:*:table/${imagesTable}`,
+      },
+      {
+        Effect: 'Allow',
+        Action: ['dynamodb:Query'],
+        Resource: `arn:aws:dynamodb:${region}:*:table/${imagesTable}/index/${imageIdIndex}`,
       },
     ],
   },
@@ -75,6 +83,10 @@ const serverlessConfiguration: AWS = {
               AttributeName: 'timestamp',
               AttributeType: 'S',
             },
+            {
+              AttributeName: 'imageId',
+              AttributeType: 'S',
+            },
           ],
           KeySchema: [
             {
@@ -86,6 +98,20 @@ const serverlessConfiguration: AWS = {
               KeyType: 'RANGE',
             },
           ],
+          GlobalSecondaryIndexes: [
+            {
+              IndexName: imageIdIndex,
+              KeySchema: [
+                {
+                  AttributeName: 'imageId',
+                  KeyType: 'HASH',
+                },
+              ],
+              Projection: {
+                ProjectionType: 'ALL',
+              },
+            },
+          ],
           BillingMode: 'PAY_PER_REQUEST',
           TableName: imagesTable,
         },
@@ -93,7 +119,7 @@ const serverlessConfiguration: AWS = {
     },
   },
   // import the function via paths
-  functions: { hello, getGroups, createGroup, getImages },
+  functions: { hello, getGroups, createGroup, getImages, getImage },
   package: { individually: true },
   custom: {
     esbuild: {
