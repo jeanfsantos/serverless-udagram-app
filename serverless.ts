@@ -8,10 +8,12 @@ import createImage from '@functions/createImage';
 import hello from '@functions/hello';
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
+import { awsAccountId } from '@libs/account-id';
 
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;
 const imageIdIndex = 'imageIdIndex';
+const imageS3Bucket = `serverless-udagram-images-${awsAccountId}-${stage}`;
 
 const serverlessConfiguration: AWS = {
   service: 'serverless-udagram-app',
@@ -30,6 +32,7 @@ const serverlessConfiguration: AWS = {
       GROUPS_TABLE: groupsTable,
       IMAGES_TABLE: imagesTable,
       IMAGE_ID_INDEX: imageIdIndex,
+      IMAGE_S3_BUCKET: imageS3Bucket,
     },
     region,
     stage,
@@ -115,6 +118,47 @@ const serverlessConfiguration: AWS = {
           ],
           BillingMode: 'PAY_PER_REQUEST',
           TableName: imagesTable,
+        },
+      },
+      AttachmentsBucket: {
+        Type: 'AWS::S3::Bucket',
+        Properties: {
+          BucketName: imageS3Bucket,
+          PublicAccessBlockConfiguration: {
+            BlockPublicPolicy: false,
+            RestrictPublicBuckets: false,
+          },
+          CorsConfiguration: {
+            CorsRules: [
+              {
+                AllowedOrigins: ['*'],
+                AllowedHeaders: ['*'],
+                AllowedMethods: ['GET', 'PUT', 'POST', 'DELETE', 'HEAD'],
+                MaxAge: 3000,
+              },
+            ],
+          },
+        },
+      },
+      BucketPolicy: {
+        Type: 'AWS::S3::BucketPolicy',
+        Properties: {
+          PolicyDocument: {
+            Id: 'MyPolicy',
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Sid: 'PublicReadForGetBucketObjects',
+                Effect: 'Allow',
+                Principal: '*',
+                Action: 's3:GetObject',
+                Resource: `arn:aws:s3:::${imageS3Bucket}/*`,
+              },
+            ],
+          },
+          Bucket: {
+            Ref: 'AttachmentsBucket',
+          },
         },
       },
     },
