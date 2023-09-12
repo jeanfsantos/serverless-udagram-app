@@ -8,3 +8,7 @@ export { default as createImage } from './createImage';
 
 // s3 events
 export { default as sendUploadNotifications } from './sendUploadNotifications';
+
+// websocket events
+export { default as connectHandler } from './connectHandler';
+export { default as disconnectHandler } from './disconnectHandler';

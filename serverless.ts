@@ -1,11 +1,18 @@
 import type { AWS } from '@serverless/typescript';
 
+// websocket
+import connectHandler from '@functions/connectHandler';
+import disconnectHandler from '@functions/disconnectHandler';
+
+// http
 import createGroup from '@functions/createGroup';
 import createImage from '@functions/createImage';
 import getGroups from '@functions/getGroups';
 import getImage from '@functions/getImage';
 import getImages from '@functions/getImages';
 import hello from '@functions/hello';
+
+// s3
 import sendUploadNotifications from '@functions/sendUploadNotifications';
 
 import { region } from '@libs/check-region';
@@ -15,6 +22,7 @@ import { imageS3Bucket } from '@libs/s3-bucket';
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;
 const imageIdIndex = 'imageIdIndex';
+const connectionsTable = `Connections-${stage}`;
 
 const serverlessConfiguration: AWS = {
   service: 'serverless-udagram-app',
@@ -36,6 +44,7 @@ const serverlessConfiguration: AWS = {
       IMAGE_S3_BUCKET: imageS3Bucket,
       SIGNED_URL_EXPIRATION: '300',
       REGION: region,
+      CONNECTIONS_TABLE: connectionsTable,
     },
     region,
     stage,
@@ -59,6 +68,11 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: ['s3:PutObject', 's3:GetObject'],
         Resource: `arn:aws:s3:::${imageS3Bucket}/*`,
+      },
+      {
+        Effect: 'Allow',
+        Action: ['dynamodb:Scan', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
+        Resource: `arn:aws:dynamodb:${region}:*:table/${connectionsTable}`,
       },
     ],
   },
@@ -128,6 +142,25 @@ const serverlessConfiguration: AWS = {
           TableName: imagesTable,
         },
       },
+      ConnectionsDynamoDBTable: {
+        Type: 'AWS::DynamoDB::Table',
+        Properties: {
+          AttributeDefinitions: [
+            {
+              AttributeName: 'id',
+              AttributeType: 'S',
+            },
+          ],
+          KeySchema: [
+            {
+              AttributeName: 'id',
+              KeyType: 'HASH',
+            },
+          ],
+          BillingMode: 'PAY_PER_REQUEST',
+          TableName: connectionsTable,
+        },
+      },
       AttachmentsBucket: {
         Type: 'AWS::S3::Bucket',
         Properties: {
@@ -193,6 +226,8 @@ const serverlessConfiguration: AWS = {
     getImage,
     createImage,
     sendUploadNotifications,
+    connectHandler,
+    disconnectHandler,
   },
   package: { individually: true },
   custom: {
