@@ -1,19 +1,20 @@
 import type { AWS } from '@serverless/typescript';
 
 import createGroup from '@functions/createGroup';
+import createImage from '@functions/createImage';
 import getGroups from '@functions/getGroups';
 import getImage from '@functions/getImage';
 import getImages from '@functions/getImages';
-import createImage from '@functions/createImage';
 import hello from '@functions/hello';
+import sendUploadNotifications from '@functions/sendUploadNotifications';
+
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
-import { awsAccountId } from '@libs/account-id';
+import { imageS3Bucket } from '@libs/s3-bucket';
 
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;
 const imageIdIndex = 'imageIdIndex';
-const imageS3Bucket = `serverless-udagram-images-${awsAccountId}-${stage}`;
 
 const serverlessConfiguration: AWS = {
   service: 'serverless-udagram-app',
@@ -34,6 +35,7 @@ const serverlessConfiguration: AWS = {
       IMAGE_ID_INDEX: imageIdIndex,
       IMAGE_S3_BUCKET: imageS3Bucket,
       SIGNED_URL_EXPIRATION: '300',
+      REGION: region,
     },
     region,
     stage,
@@ -130,6 +132,19 @@ const serverlessConfiguration: AWS = {
         Type: 'AWS::S3::Bucket',
         Properties: {
           BucketName: imageS3Bucket,
+          NotificationConfiguration: {
+            LambdaConfigurations: [
+              {
+                Event: 's3:ObjectCreated:*',
+                Function: {
+                  'Fn::GetAtt': [
+                    'SendUploadNotificationsLambdaFunction',
+                    'Arn',
+                  ],
+                },
+              },
+            ],
+          },
           PublicAccessBlockConfiguration: {
             BlockPublicPolicy: false,
             RestrictPublicBuckets: false,
@@ -177,6 +192,7 @@ const serverlessConfiguration: AWS = {
     getImages,
     getImage,
     createImage,
+    sendUploadNotifications,
   },
   package: { individually: true },
   custom: {

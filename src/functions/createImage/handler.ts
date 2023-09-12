@@ -1,8 +1,8 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
-import { randomUUID } from 'crypto';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { randomUUID } from 'crypto';
 
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { formatJSONResponse } from '@libs/api-gateway';
@@ -17,6 +17,7 @@ const s3 = new S3Client();
 const imagesTable = process.env.IMAGES_TABLE;
 const bucketName = process.env.IMAGE_S3_BUCKET;
 const urlExpiration = process.env.SIGNED_URL_EXPIRATION;
+const region = process.env.REGION;
 
 const createImage: ValidatedEventAPIGatewayProxyEvent<
   typeof schema
@@ -31,6 +32,7 @@ const createImage: ValidatedEventAPIGatewayProxyEvent<
     timestamp,
     imageId,
     title,
+    imageUrl: `https://${bucketName}.s3.${region}.amazonaws.com/${imageId}`,
   };
 
   const command = new PutCommand({

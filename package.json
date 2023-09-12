@@ -16,7 +16,8 @@
     "@aws-sdk/lib-dynamodb": "^3.409.0",
     "@aws-sdk/s3-request-presigner": "^3.410.0",
     "@middy/core": "^3.4.0",
-    "@middy/http-json-body-parser": "^3.4.0"
+    "@middy/http-json-body-parser": "^3.4.0",
+    "aws-lambda": "^1.0.7"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
