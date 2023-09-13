@@ -45,6 +45,7 @@ const serverlessConfiguration: AWS = {
       SIGNED_URL_EXPIRATION: '300',
       REGION: region,
       CONNECTIONS_TABLE: connectionsTable,
+      STAGE: stage,
     },
     region,
     stage,

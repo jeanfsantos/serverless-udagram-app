@@ -2,6 +2,11 @@ import { handlerPath } from '@libs/handler-resolver';
 import { imageS3Bucket } from '@libs/s3-bucket';
 
 export default {
+  environment: {
+    API_ID: {
+      Ref: 'WebsocketsApi',
+    },
+  },
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
