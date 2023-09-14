@@ -15,6 +15,9 @@ import hello from '@functions/hello';
 // s3
 import sendUploadNotifications from '@functions/sendUploadNotifications';
 
+// dynamodb stream
+import elasticSearchSync from '@functions/elasticSearchSync';
+
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
 import { imageS3Bucket } from '@libs/s3-bucket';
@@ -140,6 +143,9 @@ const serverlessConfiguration: AWS = {
             },
           ],
           BillingMode: 'PAY_PER_REQUEST',
+          StreamSpecification: {
+            StreamViewType: 'NEW_IMAGE',
+          },
           TableName: imagesTable,
         },
       },
@@ -229,6 +235,7 @@ const serverlessConfiguration: AWS = {
     sendUploadNotifications,
     connectHandler,
     disconnectHandler,
+    elasticSearchSync,
   },
   package: { individually: true },
   custom: {
