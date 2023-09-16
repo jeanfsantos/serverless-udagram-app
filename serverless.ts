@@ -21,8 +21,9 @@ import elasticSearchSync from '@functions/elasticSearchSync';
 
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
-import { imageS3Bucket } from '@libs/s3-bucket';
+import { imageS3Bucket, thumbnailS3Bucket } from '@libs/s3-bucket';
 import { topicName } from '@libs/sns-topic';
+import resizeImage from '@functions/resizeImage';
 
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;
@@ -58,6 +59,7 @@ const serverlessConfiguration: AWS = {
       CONNECTIONS_TABLE: connectionsTable,
       STAGE: stage,
       TOPIC_NAME: topicName,
+      THUMBNAIL_S3_BUCKET: thumbnailS3Bucket,
     },
     region,
     stage,
@@ -81,6 +83,11 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: ['s3:PutObject', 's3:GetObject'],
         Resource: `arn:aws:s3:::${imageS3Bucket}/*`,
+      },
+      {
+        Effect: 'Allow',
+        Action: ['s3:PutObject'],
+        Resource: `arn:aws:s3:::${thumbnailS3Bucket}/*`,
       },
       {
         Effect: 'Allow',
@@ -315,6 +322,12 @@ const serverlessConfiguration: AWS = {
           ],
         },
       },
+      ThumbnailsBucket: {
+        Type: 'AWS::S3::Bucket',
+        Properties: {
+          BucketName: thumbnailS3Bucket,
+        },
+      },
     },
   },
   // import the function via paths
@@ -329,6 +342,7 @@ const serverlessConfiguration: AWS = {
     connectHandler,
     disconnectHandler,
     elasticSearchSync,
+    resizeImage,
   },
   package: { individually: true },
   custom: {

@@ -21,7 +21,8 @@
     "@middy/core": "^3.4.0",
     "@middy/http-json-body-parser": "^3.4.0",
     "aws-elasticsearch-js": "^1.0.3",
-    "aws-lambda": "^1.0.7"
+    "aws-lambda": "^1.0.7",
+    "jimp": "^0.22.10"
   },
   "devDependencies": {
     "@serverless/typescript": "^3.0.0",
