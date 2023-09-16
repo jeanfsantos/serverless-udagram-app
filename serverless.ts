@@ -22,6 +22,7 @@ import elasticSearchSync from '@functions/elasticSearchSync';
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
 import { imageS3Bucket } from '@libs/s3-bucket';
+import { topicName } from '@libs/sns-topic';
 
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;
@@ -56,6 +57,7 @@ const serverlessConfiguration: AWS = {
       REGION: region,
       CONNECTIONS_TABLE: connectionsTable,
       STAGE: stage,
+      TOPIC_NAME: topicName,
     },
     region,
     stage,
@@ -187,17 +189,15 @@ const serverlessConfiguration: AWS = {
       },
       AttachmentsBucket: {
         Type: 'AWS::S3::Bucket',
+        DependsOn: ['SNSTopicPolicy'],
         Properties: {
           BucketName: imageS3Bucket,
           NotificationConfiguration: {
-            LambdaConfigurations: [
+            TopicConfigurations: [
               {
-                Event: 's3:ObjectCreated:*',
-                Function: {
-                  'Fn::GetAtt': [
-                    'SendUploadNotificationsLambdaFunction',
-                    'Arn',
-                  ],
+                Event: 's3:ObjectCreated:Put',
+                Topic: {
+                  Ref: 'ImagesTopic',
                 },
               },
             ],
@@ -276,6 +276,43 @@ const serverlessConfiguration: AWS = {
               },
             ],
           },
+        },
+      },
+      ImagesTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          DisplayName: 'Image bucket topic',
+          TopicName: topicName,
+        },
+      },
+      SNSTopicPolicy: {
+        Type: 'AWS::SNS::TopicPolicy',
+        Properties: {
+          PolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  AWS: '*',
+                },
+                Action: 'sns:Publish',
+                Resource: {
+                  Ref: 'ImagesTopic',
+                },
+                Condition: {
+                  ArnLike: {
+                    'AWS:SourceArn': `arn:aws:s3:::${imageS3Bucket}`,
+                  },
+                },
+              },
+            ],
+          },
+          Topics: [
+            {
+              Ref: 'ImagesTopic',
+            },
+          ],
         },
       },
     },

@@ -8,7 +8,7 @@ import {
   ScanCommand,
 } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { S3Event, S3Handler } from 'aws-lambda';
+import { S3Event, SNSEvent, SNSHandler } from 'aws-lambda';
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -24,7 +24,19 @@ const connectionParams = {
 
 const apiGateway = new ApiGatewayManagementApiClient(connectionParams);
 
-const sendUploadNotifications: S3Handler = async (event: S3Event) => {
+const snsHandler: SNSHandler = async (event: SNSEvent) => {
+  console.log('Processing SNS event ', JSON.stringify(event));
+
+  for (const snsRecord of event.Records) {
+    const s3EventStr = snsRecord.Sns.Message;
+    console.log('Processing S3 event', s3EventStr);
+    const s3Event = JSON.parse(s3EventStr);
+
+    await processS3Event(s3Event);
+  }
+};
+
+async function processS3Event(event: S3Event) {
   for (const record of event.Records) {
     const key = record.s3.object.key;
     console.log('Processing S3 item with key: ', key);
@@ -43,7 +55,7 @@ const sendUploadNotifications: S3Handler = async (event: S3Event) => {
       await sendMessageToClient(connectionId, payload);
     }
   }
-};
+}
 
 async function sendMessageToClient(connectionId, payload) {
   try {
@@ -73,4 +85,4 @@ async function sendMessageToClient(connectionId, payload) {
   }
 }
 
-export const main = sendUploadNotifications;
+export const main = snsHandler;

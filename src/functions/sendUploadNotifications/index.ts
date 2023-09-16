@@ -1,5 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
-import { imageS3Bucket } from '@libs/s3-bucket';
+import { topicName, topicNameArn } from '@libs/sns-topic';
 
 export default {
   environment: {
@@ -10,18 +10,9 @@ export default {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     {
-      s3: {
-        bucket: imageS3Bucket,
-        event: 's3:ObjectCreated:*',
-        rules: [
-          {
-            prefix: 'images/',
-          },
-          {
-            suffix: '.png',
-          },
-        ],
-        existing: true,
+      sns: {
+        arn: topicNameArn,
+        topicName: topicName,
       },
     },
   ],
