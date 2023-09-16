@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import type { AWS } from '@serverless/typescript';
 
 // websocket
@@ -83,6 +84,16 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: ['dynamodb:Scan', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
         Resource: `arn:aws:dynamodb:${region}:*:table/${connectionsTable}`,
+      },
+      {
+        Effect: 'Allow',
+        Action: ['dynamodb:Scan', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
+        Resource: `arn:aws:dynamodb:${region}:*:table/${connectionsTable}`,
+      },
+      {
+        Effect: 'Allow',
+        Action: ['es:ESHttpPut'],
+        Resource: `arn:aws:es:${region}:*:domain/images-search-${stage}/*`,
       },
     ],
   },
@@ -231,7 +242,7 @@ const serverlessConfiguration: AWS = {
       ImagesSearch: {
         Type: 'AWS::Elasticsearch::Domain',
         Properties: {
-          ElasticsearchVersion: '6.3',
+          ElasticsearchVersion: '7.10',
           DomainName: `images-search-${stage}`,
           ElasticsearchClusterConfig: {
             DedicatedMasterEnabled: false,
@@ -253,7 +264,7 @@ const serverlessConfiguration: AWS = {
                 Principal: {
                   AWS: `*`,
                 },
-                Action: ['es:ESHttp*'],
+                Action: ['es:*'],
                 Resource: {
                   'Fn::Sub': `arn:aws:es:${region}:*:domain/images-search-${stage}/*`,
                 },
