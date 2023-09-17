@@ -20,6 +20,9 @@ import sendUploadNotifications from '@functions/s3/sendUploadNotifications';
 // dynamodb stream
 import elasticSearchSync from '@functions/dynamoDB/elasticSearchSync';
 
+// auth
+import auth0Authorizer from '@functions/auth/auth0Authorizer';
+
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
 import { imageS3Bucket, thumbnailS3Bucket } from '@libs/s3-bucket';
@@ -105,9 +108,33 @@ const serverlessConfiguration: AWS = {
         Resource: `arn:aws:es:${region}:*:domain/images-search-${stage}/*`,
       },
     ],
+    httpApi: {
+      authorizers: {
+        auth0Authorizer: {
+          type: 'request',
+          functionName: 'auth0Authorizer',
+        },
+      },
+    },
   },
   resources: {
     Resources: {
+      // GatewayResponseDefault4XX: {
+      //   Type: 'AWS::ApiGateway::GatewayResponse',
+      //   Properties: {
+      //     ResponseParameters: {
+      //       'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+      //       'gatewayresponse.header.Access-Control-Allow-Headers':
+      //         "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+      //       'gatewayresponse.header.Access-Control-Allow-Methods':
+      //         "'GET,OPTIONS,POST'",
+      //     },
+      //     ResponseType: 'DEFAULT_4XX',
+      //     RestApiId: {
+      //       Ref: 'ApiGatewayRestApi',
+      //     },
+      //   },
+      // },
       GroupsDynamoDBTable: {
         Type: 'AWS::DynamoDB::Table',
         Properties: {
@@ -343,6 +370,7 @@ const serverlessConfiguration: AWS = {
     disconnectHandler,
     elasticSearchSync,
     resizeImage,
+    auth0Authorizer,
   },
   package: { individually: true },
   custom: {
