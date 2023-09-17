@@ -1,29 +1,29 @@
-import 'dotenv/config';
 import type { AWS } from '@serverless/typescript';
+import 'dotenv/config';
 
 // websocket
-import connectHandler from '@functions/connectHandler';
-import disconnectHandler from '@functions/disconnectHandler';
+import connectHandler from '@functions/websocket/connectHandler';
+import disconnectHandler from '@functions/websocket/disconnectHandler';
 
 // http
-import createGroup from '@functions/createGroup';
-import createImage from '@functions/createImage';
-import getGroups from '@functions/getGroups';
-import getImage from '@functions/getImage';
-import getImages from '@functions/getImages';
-import hello from '@functions/hello';
+import createGroup from '@functions/http/createGroup';
+import createImage from '@functions/http/createImage';
+import getGroups from '@functions/http/getGroups';
+import getImage from '@functions/http/getImage';
+import getImages from '@functions/http/getImages';
+import hello from '@functions/http/hello';
 
 // s3
-import sendUploadNotifications from '@functions/sendUploadNotifications';
+import resizeImage from '@functions/s3/resizeImage';
+import sendUploadNotifications from '@functions/s3/sendUploadNotifications';
 
 // dynamodb stream
-import elasticSearchSync from '@functions/elasticSearchSync';
+import elasticSearchSync from '@functions/dynamoDB/elasticSearchSync';
 
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
 import { imageS3Bucket, thumbnailS3Bucket } from '@libs/s3-bucket';
 import { topicName } from '@libs/sns-topic';
-import resizeImage from '@functions/resizeImage';
 
 const groupsTable = `Groups-${stage}`;
 const imagesTable = `Images-${stage}`;

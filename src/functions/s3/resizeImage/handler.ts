@@ -43,7 +43,7 @@ async function processImage(record: S3EventRecord) {
 
     const resizedImage = image.resize(150, Jimp.AUTO);
 
-    const convertedBuffer = await resizedImage.getBufferAsync(Jimp.MIME_JPEG);
+    const convertedBuffer = await resizedImage.getBufferAsync(Jimp.AUTO);
 
     const putCommand = new PutObjectCommand({
       Bucket: thumbnailBucketName,
