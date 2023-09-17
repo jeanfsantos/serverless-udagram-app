@@ -20,6 +20,7 @@
     "@aws-sdk/s3-request-presigner": "^3.410.0",
     "@elastic/elasticsearch": "^7.10.0",
     "@middy/core": "^3.4.0",
+    "@middy/http-cors": "^4.6.2",
     "@middy/http-json-body-parser": "^3.4.0",
     "@middy/secrets-manager": "^4.6.2",
     "aws-elasticsearch-js": "^1.0.3",

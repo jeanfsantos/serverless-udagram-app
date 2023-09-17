@@ -30,9 +30,6 @@ const getImages: ValidatedEventAPIGatewayProxyEvent<
       body: JSON.stringify({
         error: 'Group does not exist.',
       }),
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
     };
   }
 
@@ -43,9 +40,6 @@ const getImages: ValidatedEventAPIGatewayProxyEvent<
     body: JSON.stringify({
       items: images,
     }),
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
   };
 };
 

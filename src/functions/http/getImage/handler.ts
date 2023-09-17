@@ -39,18 +39,12 @@ const getImage: ValidatedEventAPIGatewayProxyEvent<
     return {
       statusCode: 200,
       body: JSON.stringify(result.Items[0]),
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      },
     };
   }
 
   return {
     statusCode: 404,
     body: 'Not found image',
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
   };
 };
 

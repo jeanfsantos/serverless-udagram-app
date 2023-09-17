@@ -3,7 +3,6 @@ import { DynamoDBDocumentClient, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { randomUUID } from 'crypto';
 
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
-import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import schema from './schema';
 
@@ -32,10 +31,8 @@ const createGroup: ValidatedEventAPIGatewayProxyEvent<
   await docClient.send(command);
 
   return {
-    ...formatJSONResponse(newItem),
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
+    statusCode: 201,
+    body: JSON.stringify(newItem),
   };
 };
 

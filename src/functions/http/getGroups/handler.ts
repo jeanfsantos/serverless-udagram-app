@@ -1,6 +1,5 @@
 import { DynamoDBClient, ScanCommand } from '@aws-sdk/client-dynamodb';
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
-import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
@@ -40,13 +39,11 @@ const getGroups: ValidatedEventAPIGatewayProxyEvent<
   });
 
   return {
-    ...formatJSONResponse({
+    statusCode: 200,
+    body: JSON.stringify({
       items,
       nextKey: encodeNextKey(result.LastEvaluatedKey),
     }),
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
   };
 };
 

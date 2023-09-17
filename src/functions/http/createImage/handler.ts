@@ -5,7 +5,6 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
-import { formatJSONResponse } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import schema from './schema';
 
@@ -45,13 +44,11 @@ const createImage: ValidatedEventAPIGatewayProxyEvent<
   const uploadUrl = await getUploadUrl(imageId);
 
   return {
-    ...formatJSONResponse({
+    statusCode: 201,
+    body: JSON.stringify({
       item: newItem,
       uploadUrl,
     }),
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-    },
   };
 };
 
