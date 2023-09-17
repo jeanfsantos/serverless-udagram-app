@@ -44,10 +44,15 @@ const createImage: ValidatedEventAPIGatewayProxyEvent<
 
   const uploadUrl = await getUploadUrl(imageId);
 
-  return formatJSONResponse({
-    item: newItem,
-    uploadUrl,
-  });
+  return {
+    ...formatJSONResponse({
+      item: newItem,
+      uploadUrl,
+    }),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  };
 };
 
 async function getUploadUrl(imageId: string): Promise<string> {

@@ -31,7 +31,12 @@ const createGroup: ValidatedEventAPIGatewayProxyEvent<
 
   await docClient.send(command);
 
-  return formatJSONResponse(newItem);
+  return {
+    ...formatJSONResponse(newItem),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  };
 };
 
 export const main = middyfy(createGroup);

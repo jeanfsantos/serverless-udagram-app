@@ -39,10 +39,15 @@ const getGroups: ValidatedEventAPIGatewayProxyEvent<
     };
   });
 
-  return formatJSONResponse({
-    items,
-    nextKey: encodeNextKey(result.LastEvaluatedKey),
-  });
+  return {
+    ...formatJSONResponse({
+      items,
+      nextKey: encodeNextKey(result.LastEvaluatedKey),
+    }),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    },
+  };
 };
 
 /**
