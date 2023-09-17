@@ -1,5 +1,6 @@
-import type { AWS } from '@serverless/typescript';
 import 'dotenv/config';
+
+import type { AWS } from '@serverless/typescript';
 
 // websocket
 import connectHandler from '@functions/websocket/connectHandler';
