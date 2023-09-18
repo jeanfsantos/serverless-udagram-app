@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 import schema from './schema';
+import { getUserId } from 'src/auth/utils';
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -16,9 +17,13 @@ const createGroup: ValidatedEventAPIGatewayProxyEvent<
   const itemId = randomUUID();
 
   const { name, description } = event.body;
+  const authorization = event.headers.Authorization;
+  const split = authorization.split(' ');
+  const jwtToken = split[1];
 
   const newItem = {
     id: itemId,
+    userId: getUserId(jwtToken),
     name,
     description,
   };

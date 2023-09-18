@@ -23,6 +23,7 @@ import elasticSearchSync from '@functions/dynamoDB/elasticSearchSync';
 
 // auth
 import auth0Authorizer from '@functions/auth/auth0Authorizer';
+import Rs256Auth0Authorizer from '@functions/auth/rs256Auth0Authorizer';
 
 import { region } from '@libs/check-region';
 import { stage } from '@libs/check-stage';
@@ -424,6 +425,7 @@ const serverlessConfiguration: AWS = {
     elasticSearchSync,
     resizeImage,
     auth0Authorizer,
+    Rs256Auth0Authorizer,
   },
   package: { individually: true },
   custom: {
