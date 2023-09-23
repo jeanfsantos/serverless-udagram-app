@@ -3,8 +3,9 @@ import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
 
 import schema from './schema';
+import { dynamodbClientOptions } from 'src/config/dynamodbClientOptions';
 
-const client = new DynamoDBClient({});
+const client = new DynamoDBClient(dynamodbClientOptions);
 
 const groupsTable = process.env.GROUPS_TABLE;
 

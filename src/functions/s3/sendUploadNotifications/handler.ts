@@ -9,8 +9,9 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 import { S3Event, SNSEvent, SNSHandler } from 'aws-lambda';
+import { dynamodbClientOptions } from 'src/config/dynamodbClientOptions';
 
-const client = new DynamoDBClient({});
+const client = new DynamoDBClient(dynamodbClientOptions);
 const docClient = DynamoDBDocumentClient.from(client);
 
 const connectionsTable = process.env.CONNECTIONS_TABLE;

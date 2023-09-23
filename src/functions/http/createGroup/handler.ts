@@ -4,10 +4,11 @@ import { randomUUID } from 'crypto';
 
 import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/api-gateway';
 import { middyfy } from '@libs/lambda';
-import schema from './schema';
 import { getUserId } from 'src/auth/utils';
+import { dynamodbClientOptions } from 'src/config/dynamodbClientOptions';
+import schema from './schema';
 
-const client = new DynamoDBClient({});
+const client = new DynamoDBClient(dynamodbClientOptions);
 const docClient = DynamoDBDocumentClient.from(client);
 const groupsTable = process.env.GROUPS_TABLE;
 

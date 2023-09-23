@@ -5,8 +5,9 @@ import {
   APIGatewayProxyHandler,
   APIGatewayProxyResult,
 } from 'aws-lambda';
+import { dynamodbClientOptions } from 'src/config/dynamodbClientOptions';
 
-const client = new DynamoDBClient({});
+const client = new DynamoDBClient(dynamodbClientOptions);
 const docClient = DynamoDBDocumentClient.from(client);
 
 const connectionsTable = process.env.CONNECTIONS_TABLE;

@@ -45,7 +45,7 @@ if (!myIpAddress) {
 const serverlessConfiguration: AWS = {
   service: 'serverless-udagram-app',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild'],
+  plugins: ['serverless-esbuild', 'serverless-dynamodb', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -68,6 +68,7 @@ const serverlessConfiguration: AWS = {
       THUMBNAIL_S3_BUCKET: thumbnailS3Bucket,
       AUTH_0_SECRET_ID: auth0SecretId,
       AUTH_0_SECRET_FIELD: 'auth0Secret',
+      IS_OFFLINE: process.env.IS_OFFLINE,
     },
     region,
     stage,
@@ -438,6 +439,18 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+    },
+    'serverless-offline': {
+      httpPort: 3003,
+    },
+    'serverless-dynamodb': {
+      stages: ['dev'],
+      start: {
+        port: 8000,
+        docker: false,
+        inMenory: true,
+        migrate: true,
+      },
     },
   },
 };
